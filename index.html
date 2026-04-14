@@ -1,382 +1,608 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CleanCare - Professional Cleaning Store</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanCare Pro | Complete Enterprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00c896; --dark: #050505; --card: #111; --border: #222; --text: #fff; --dim: #a3a3a3; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--dark); color: var(--text); overflow-x: hidden; }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
-body{background:#050505;color:white}
+        /* --- HEADER & NAVIGATION --- */
+        header { position: fixed; width: 100%; top: 0; background: rgba(5,5,5,0.95); backdrop-filter: blur(12px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-bottom: 1px solid var(--border); }
+        .logo { font-size: 24px; font-weight: 800; color: var(--primary); cursor: pointer; }
+        .search-bar { flex: 1; max-width: 400px; margin: 0 20px; padding: 10px 20px; background: #1a1a1a; border: 1px solid var(--border); border-radius: 50px; color: white; }
+        .nav-btns { display: flex; gap: 10px; align-items: center; }
+        .chip-btn { padding: 8px 18px; background: var(--card); border: 1px solid var(--border); border-radius: 50px; color: white; cursor: pointer; font-size: 13px; font-weight: 700; transition: 0.3s; white-space: nowrap; }
+        .chip-btn.active, .chip-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
 
-header{
-position:fixed;
-width:100%;
-top:0;
-background:#000;
-padding:15px 40px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-z-index:1000
-}
+        /* --- HERO BANNER --- */
+        .hero { height: 45vh; background: linear-gradient(to bottom, rgba(0,0,0,0.4), var(--dark)), url('https://images.unsplash.com/photo-1581578731548-c64695cc6952') center/cover; margin-top: 70px; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+        .hero h1 { font-size: 3rem; font-weight: 800; color: white; margin-bottom: 10px; }
+        .hero p { color: var(--primary); font-weight: 600; font-size: 1.2rem; }
 
-.logo{
-color:#00c896;
-font-size:26px;
-font-weight:700
-}
+        /* --- MAIN LAYOUT --- */
+        .container { padding: 40px 5% 50px; min-height: 50vh; }
+        .cat-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; margin-bottom: 20px; }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .section-title { margin: 30px 0 15px; font-size: 24px; color: var(--text); border-left: 4px solid var(--primary); padding-left: 10px; display: none; }
 
-.search{
-padding:8px 15px;
-border-radius:20px;
-border:none;
-width:250px
-}
+        /* --- PRODUCT CARDS --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; display: none; }
+        .p-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--border); position: relative; transition: 0.3s; display: flex; flex-direction: column; }
+        .p-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        
+        .img-box { width: 100%; height: 200px; border-radius: 12px; overflow: hidden; background: #000; position: relative; }
+        .img-box img { width: 100%; height: 100%; object-fit: contain; display: none; }
+        .img-box img.active { display: block; }
+        
+        .thumb-nav { display: flex; gap: 8px; margin-top: 10px; justify-content: center; }
+        .thumb { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; opacity: 0.4; }
+        .thumb.active { opacity: 1; border-color: var(--primary); }
 
-.cart-btn{
-background:#00c896;
-padding:10px 20px;
-border-radius:20px;
-cursor:pointer
-}
+        .price-tag { font-size: 22px; font-weight: 800; color: var(--primary); margin: 10px 0; }
+        .old-price { font-size: 12px; text-decoration: line-through; color: var(--dim); margin-left: 8px; }
+        .hot-label { position: absolute; top: 15px; right: 15px; background: #ff3e3e; color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; z-index: 10; }
+        .stock-label { font-size: 11px; font-weight: 700; margin-bottom: 10px; }
 
-.hero{
-height:80vh;
-background:url('https://images.unsplash.com/photo-1581578731548-c64695cc6952');
-background-size:cover;
-margin-top:70px
-}
+        /* --- SIDE PANELS --- */
+        .side-panel { position: fixed; top: 0; right: -100%; width: 420px; height: 100%; background: #0a0a0a; z-index: 2000; transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1); padding: 30px; border-left: 1px solid var(--border); overflow-y: auto; }
+        .side-panel.active { right: 0; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; display: none; backdrop-filter: blur(4px); }
+        .overlay.active { display: block; }
 
-.section{padding:70px 40px}
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid var(--border); color: white; border-radius: 10px; }
+        .main-btn { width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 15px; color:#000; transition: 0.2s; }
+        .main-btn:disabled { background: #333; cursor: not-allowed; color: #777; }
+        .sec-btn { background: #222; color: #fff; margin-top: 10px; }
+        .danger-btn { background: #ff3e3e; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
 
-.category-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px
-}
-
-.category-card{
-background:#111;
-padding:30px;
-border-radius:12px;
-cursor:pointer;
-text-align:center;
-transition:.3s
-}
-
-.category-card:hover{transform:translateY(-5px)}
-
-.products{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px
-}
-
-.product{
-background:#111;
-padding:20px;
-border-radius:12px;
-position:relative
-}
-
-.product img{
-width:100%;
-height:200px;
-object-fit:contain
-}
-
-.badge{
-position:absolute;
-top:10px;
-left:10px;
-background:red;
-padding:5px 10px;
-border-radius:6px
-}
-
-.price{color:#00c896;margin:10px 0}
-
-.qty{
-display:flex;
-justify-content:center;
-margin:10px 0
-}
-
-.qty button{
-padding:5px 12px;
-margin:0 5px
-}
-
-.add-btn{
-background:#00c896;
-padding:10px;
-border:none;
-border-radius:20px;
-width:100%;
-cursor:pointer;
-margin-top:5px
-}
-
-.cart-overlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:#0008;
-display:none;
-z-index:9998
-}
-
-.cart{
-position:fixed;
-right:-420px;
-top:0;
-width:380px;
-height:100vh;
-background:#111;
-padding:20px;
-transition:.3s;
-overflow:auto;
-z-index:9999
-}
-
-.cart.active{right:0}
-.cart-overlay.active{display:block}
-
-footer{
-background:#000;
-padding:60px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:30px
-}
-
-.footer-title{color:#00c896}
-
-.whatsapp{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25D366;
-padding:15px;
-border-radius:50%;
-cursor:pointer
-}
-
-</style>
+        /* --- UI ELEMENTS --- */
+        .item-row { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; background: var(--primary); color: #000; }
+        .whatsapp-btn { position: fixed; bottom: 25px; right: 25px; background: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 999; transition: 0.3s; }
+        .whatsapp-btn:hover { transform: scale(1.1); }
+        
+        footer { background: #000; padding: 60px 5%; border-top: 1px solid var(--border); margin-top: 50px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
+    </style>
 </head>
-
 <body>
 
 <header>
-<div class="logo">CleanCare</div>
-<input class="search" placeholder="Search Cleaning Products" onkeyup="searchProduct(this.value)">
-<div class="cart-btn" onclick="toggleCart()">Cart (<span id="count">0</span>)</div>
+    <div class="logo" onclick="location.reload()">CleanCare<span style="color:#fff">.Pro</span></div>
+    <input type="text" class="search-bar" placeholder="Search products..." onkeyup="window.app.search(this.value)">
+    <div class="nav-btns" id="navAuth">
+        <button class="chip-btn" onclick="window.ui.toggle('authSide')">Account</button>
+        <button class="chip-btn" style="background:var(--primary); color:#000" onclick="window.ui.toggle('cartSide')">Cart (<span id="cartCount">0</span>)</button>
+    </div>
 </header>
 
-<section class="hero"></section>
+<section class="hero">
+    <h1>Professional Cleaning Supplies</h1>
+    <p>Delivered directly to your doorstep.</p>
+</section>
 
-<section class="section">
-<h2>Categories</h2>
-<div class="category-grid">
-<div class="category-card" onclick="filterCategory('floor')">Floor Cleaners</div>
-<div class="category-card" onclick="filterCategory('kitchen')">Kitchen Cleaning</div>
-<div class="category-card" onclick="filterCategory('bathroom')">Bathroom Cleaning</div>
-<div class="category-card" onclick="filterCategory('tools')">Cleaning Tools</div>
-<div class="category-card" onclick="filterCategory('tissue')">Tissue & Paper</div>
-<div class="category-card" onclick="filterCategory('sanitizer')">Sanitizers</div>
+<div class="container">
+    <div class="cat-scroll" id="dynamicCats">
+        <button class="chip-btn active" onclick="window.app.filter(this, 'All')">All Products</button>
+    </div>
+
+    <h2 class="section-title" id="hotTitle">Hot Deals 🔥</h2>
+    <div class="grid" id="hotGrid"></div>
+
+    <h2 class="section-title" id="mainTitle">All Products</h2>
+    <div class="grid" id="mainGrid"></div>
 </div>
-</section>
 
-<section class="section">
-<h2>Hot Deals</h2>
-<div class="products" id="hotDeals"></div>
-</section>
+<div class="whatsapp-btn" onclick="window.open('https://wa.me/919999999999')">💬</div>
+<div class="overlay" id="overlay" onclick="window.ui.closeAll()"></div>
 
-<section class="section">
-<h2>Products</h2>
-<div class="products" id="productList"></div>
-</section>
+<div class="side-panel" id="authSide">
+    
+    <div id="authBox">
+        <h2 id="authTitle">Customer Login</h2>
+        <div id="regInputs" style="display:none;">
+            <input type="text" id="rName" placeholder="Full Name">
+            <input type="text" id="rPhone" placeholder="Phone Number">
+            <textarea id="rAddr" placeholder="Delivery Address"></textarea>
+        </div>
+        <input type="email" id="lEmail" placeholder="Email">
+        <input type="password" id="lPass" placeholder="Password">
+        <button class="main-btn" onclick="window.auth.submitAuth()">Continue</button>
+        <p id="toggleAuthText" onclick="window.auth.toggleMode()" style="text-align:center; margin-top:15px; cursor:pointer; font-size:13px; color:var(--dim)">Switch to Register</p>
+        
+        <hr style="margin: 25px 0; border: #222 0.5px solid">
+        <button class="main-btn sec-btn" onclick="window.auth.showAdminAuth()">Admin Login</button>
+    </div>
 
-<div class="cart-overlay" id="overlay" onclick="toggleCart()"></div>
+    <div id="adminAuthBox" style="display:none;">
+        <h2>Admin Portal</h2>
+        <p style="color:var(--dim); font-size:12px; margin-bottom:15px">Authorized personnel only.</p>
+        <input type="email" id="adminEmail" placeholder="Admin Email">
+        <input type="password" id="adminPass" placeholder="Admin Password">
+        <button class="main-btn" onclick="window.auth.adminLogin()">Access Dashboard</button>
+        <p onclick="window.auth.showCustomerAuth()" style="text-align:center; margin-top:15px; cursor:pointer; font-size:13px; color:var(--dim)">Back to Customer Login</p>
+    </div>
 
-<div class="cart" id="cart">
-<h2>Your Cart</h2>
-<div id="cartItems"></div>
-<div id="cartTotal"></div>
-<button class="add-btn" onclick="checkout()">Checkout</button>
+    <div id="profileBox" style="display: none;">
+        <h2>My Account</h2>
+        <div class="item-row" style="flex-direction: column; align-items: flex-start; margin-top: 20px;">
+            <p style="font-size: 12px; color: var(--dim);">Full Name</p>
+            <input type="text" id="upName">
+            <p style="font-size: 12px; color: var(--dim);">Phone Number</p>
+            <input type="text" id="upPhone">
+            <p style="font-size: 12px; color: var(--dim);">Delivery Address</p>
+            <textarea id="upAddr"></textarea>
+            <button class="main-btn" style="padding: 10px; margin-top: 10px;" onclick="window.auth.updateProfile()">Update Details</button>
+        </div>
+        <h3 style="margin: 20px 0 10px;">My Order History</h3>
+        <div id="userOrders" style="max-height: 250px; overflow-y: auto;"></div>
+        <button class="main-btn sec-btn" style="background: #ff3e3e; color: #fff; margin-top: 20px;" onclick="window.auth.logout()">Logout</button>
+    </div>
+</div>
+
+<div class="side-panel" id="cartSide">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Your Cart</h2>
+        <span onclick="window.ui.toggle('cartSide')" style="cursor:pointer; font-size: 20px;">✕</span>
+    </div>
+
+    <div id="cartList" style="margin: 20px 0; max-height: 55vh; overflow-y: auto; padding-right: 10px;"></div>
+    
+    <div style="position: absolute; bottom: 30px; left: 30px; right: 30px; background: #0a0a0a; border-top: 1px solid var(--border); padding-top: 15px;">
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--dim); margin-bottom: 5px;">
+            <span>Total Savings:</span><span id="cartSavings" style="color: var(--primary);">-₹0</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 15px;">
+            <span>Total:</span><span id="cartTotal" style="color: var(--primary);">₹0</span>
+        </div>
+        <button class="main-btn" onclick="window.app.checkout()">Place Order</button>
+    </div>
+</div>
+
+<div class="side-panel" id="adminSide" style="width: 100%; max-width: 900px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Admin Control Center</h2>
+        <button class="danger-btn" style="padding: 10px 20px; font-size: 14px;" onclick="window.ui.closeAll()">Exit Admin</button>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+        
+        <div>
+            <h3>Inventory Management</h3>
+            <input id="apName" placeholder="Product Name">
+            <div style="display: flex; gap: 10px;">
+                <input id="apPrice" placeholder="Sale Price (₹)" type="number">
+                <input id="apOld" placeholder="Old Price (₹)" type="number">
+            </div>
+            <input id="apStock" placeholder="Stock Quantity" type="number">
+            <input id="apImgs" placeholder="Image URLs (comma separated)">
+            
+            <p style="font-size:12px; color:var(--dim); margin-top:10px">Select Category</p>
+            <select id="apCatSelect">
+                <option value="floor">Floor Care</option>
+                <option value="kitchen">Kitchen Expert</option>
+                <option value="tools">Pro Tools</option>
+            </select>
+            <input id="apCatNew" placeholder="Or type a new category...">
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
+                <input type="checkbox" id="apHot" style="width: 20px;">
+                <label for="apHot" style="font-size: 14px;">Mark as Hot Deal</label>
+            </div>
+            
+            <button class="main-btn" onclick="window.admin.upload()">Upload Product</button>
+
+            <h3 style="margin: 30px 0 15px;">Edit / Delete Products</h3>
+            <div id="adminProdList" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+
+        <div>
+            <h3>Customer Orders</h3>
+            <div id="adminOrderList" style="max-height: 70vh; overflow-y: auto;"></div>
+        </div>
+    </div>
 </div>
 
 <footer>
-<div>
-<h3 class="footer-title">CleanCare</h3>
-<p>Professional Cleaning Products</p>
-</div>
-<div>
-<h3 class="footer-title">Support</h3>
-<p>WhatsApp Support</p>
-</div>
-<div>
-<h3 class="footer-title">Contact</h3>
-<p>+91 9999999999</p>
-</div>
+    <div><h4>CleanCare Pro</h4><p>Premium cleaning automation solutions. Quality guaranteed.</p></div>
+    <div><h4>Contact Us</h4><p>+91 99999 99999<br>support@cleancare.pro</p></div>
+    <div><h4>Admin Access</h4><p onclick="window.ui.toggle('authSide'); window.auth.showAdminAuth();" style="cursor:pointer; color:var(--primary);">Dashboard Login</p></div>
 </footer>
 
-<div class="whatsapp" onclick="supportWhatsapp()">💬</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, where, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBXgWYT8kOQB2brDQYLZnbZEoCtgl-7Q6U",
+        authDomain: "ssenterprise-35f30.firebaseapp.com",
+        projectId: "ssenterprise-35f30",
+        storageBucket: "ssenterprise-35f30.firebasestorage.app",
+        messagingSenderId: "558852063800",
+        appId: "1:558852063800:web:f688fc4d3826018e495ccd"
+    };
 
-const products=[
-{name:"Floor Cleaner",category:"floor",price:450,discount:350,hot:true,images:["https://i.imgur.com/MN6F1Yk.png"]},
-{name:"Glass Cleaner",category:"kitchen",price:350,discount:280,images:["https://i.imgur.com/w4kG9kR.png"]},
-{name:"Bathroom Cleaner",category:"bathroom",price:400,discount:300,images:["https://i.imgur.com/SHn8WZk.png"]},
-{name:"Spin Mop",category:"tools",price:1200,discount:950,hot:true,images:["https://i.imgur.com/jxWqIBf.png"]},
-{name:"Tissue Paper",category:"tissue",price:200,discount:150,images:["https://i.imgur.com/FYF1dF5.png"]},
-{name:"Surface Sanitizer",category:"sanitizer",price:500,discount:420,images:["https://i.imgur.com/SHn8WZk.png"]}
-]
+    const appFB = initializeApp(firebaseConfig);
+    
+    window.fb = {
+        auth: getAuth(appFB), db: getFirestore(appFB),
+        createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+        collection, addDoc, getDocs, updateDoc, doc, query, where, onSnapshot, deleteDoc
+    };
 
-let cart=[]
+    // Observer
+    window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
+        if (user) {
+            const q = window.fb.query(window.fb.collection(window.fb.db, "users"), window.fb.where("email", "==", user.email));
+            const snap = await window.fb.getDocs(q);
+            snap.forEach(d => {
+                const data = d.data();
+                localStorage.setItem("cc_user", JSON.stringify({...data, docId: d.id}));
+                window.auth.showProfile(data);
+                window.app.loadHistory(user.email);
+            });
+            window.ui.setHeader(user.email);
+        } else {
+            localStorage.removeItem("cc_user");
+            window.auth.showCustomerAuth();
+            window.ui.setHeader(null);
+        }
+    });
 
-const cartEl=document.getElementById("cart")
-const overlayEl=document.getElementById("overlay")
+    // Products Sync
+    window.fb.onSnapshot(window.fb.collection(window.fb.db, "products"), (snap) => {
+        let p = []; snap.forEach(d => p.push({id: d.id, ...d.data()}));
+        window.app.products = p; 
+        window.app.render(); 
+        window.app.genCats();
+        window.admin.renderInv(p);
+    });
 
-function render(list=products){
-let html=""
-list.forEach((p,i)=>{
-html+=`
-<div class="product">
-${p.hot?'<div class="badge">Hot</div>':''}
-<img src="${p.images[0]}" onclick="openProduct(${i})">
-<h3>${p.name}</h3>
-<div class="price">₹${p.discount}</div>
-<div class="qty">
-<button onclick="qty(-1,${i})">-</button>
-<span id="q${i}">1</span>
-<button onclick="qty(1,${i})">+</button>
-</div>
-<button class="add-btn" onclick="add(${i})">Add to Cart</button>
-</div>
-`
-})
-document.getElementById("productList").innerHTML=html
-}
-
-function renderHot(){
-let html=""
-products.filter(p=>p.hot).forEach(p=>{
-html+=`<div class="product"><img src="${p.images[0]}"><h3>${p.name}</h3></div>`
-})
-document.getElementById("hotDeals").innerHTML=html
-}
-
-function filterCategory(cat){
-render(products.filter(p=>p.category===cat))
-}
-
-function qty(v,i){
-let el=document.getElementById("q"+i)
-el.innerText=Math.max(1,Number(el.innerText)+v)
-}
-
-function add(i){
-let q=Number(document.getElementById("q"+i).innerText)
-for(let k=0;k<q;k++) cart.push(products[i])
-updateCart()
-toggleCart(true)
-}
-
-function updateCart(){
-let html=""
-let subtotal=0
-
-cart.forEach((c,i)=>{
-html+=`<div style="display:flex;justify-content:space-between;margin:10px 0">
-<div>${c.name} ₹${c.discount}</div>
-<button onclick="removeItem(${i})">✕</button>
-</div>`
-subtotal+=c.discount
-})
-
-let tax=Math.round(subtotal*0.05)
-let total=subtotal+tax
-
-document.getElementById("cartItems").innerHTML=html
-
-document.getElementById("cartTotal").innerHTML=
-`Subtotal ₹${subtotal}<br>Tax ₹${tax}<br><b>Total ₹${total}</b>`
-
-document.getElementById("count").innerText=cart.length
-}
-
-function removeItem(i){
-cart.splice(i,1)
-updateCart()
-}
-
-function toggleCart(force){
-if(force){
-cartEl.classList.add("active")
-overlayEl.classList.add("active")
-return
-}
-cartEl.classList.toggle("active")
-overlayEl.classList.toggle("active")
-}
-
-function checkout(){
-let modal=`
-<div id="checkout" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000c;display:flex;justify-content:center;align-items:center;z-index:99999">
-<div style="background:#111;padding:20px;width:350px">
-<h3>Checkout</h3>
-<input id="name" placeholder="Name" style="width:100%;padding:10px;margin:5px 0">
-<input id="phone" placeholder="Phone" style="width:100%;padding:10px;margin:5px 0">
-<textarea id="address" placeholder="Address" style="width:100%;padding:10px;margin:5px 0"></textarea>
-<button class="add-btn" onclick="placeOrder()">Place Order</button>
-</div>
-</div>`
-
-document.body.insertAdjacentHTML("beforeend",modal)
-}
-
-function placeOrder(){
-let id="CC"+Math.floor(Math.random()*10000)
-let msg=`Order ID:${id}%0A`
-msg+=`Name:${name.value}%0APhone:${phone.value}%0AAddress:${address.value}%0A`
-
-cart.forEach(c=>msg+=`${c.name} ₹${c.discount}%0A`)
-
-window.open(`https://wa.me/919999999999?text=${msg}`)
-}
-
-function searchProduct(val){
-render(products.filter(p=>p.name.toLowerCase().includes(val.toLowerCase())))
-}
-
-function supportWhatsapp(){
-window.open("https://wa.me/919999999999")
-}
-
-function openProduct(i){
-let p=products[i]
-let modal=`
-<div class="cart-overlay active" onclick="this.remove()"></div>
-<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;padding:20px;width:500px;z-index:99999">
-<img src="${p.images[0]}" style="width:100%;height:300px;object-fit:contain">
-<h3>${p.name}</h3>
-<div class="price">₹${p.discount}</div>
-<button class="add-btn" onclick="add(${i})">Add To Cart</button>
-</div>`
-
-document.body.insertAdjacentHTML("beforeend",modal)
-}
-
-render()
-renderHot()
-
+    // Orders Sync
+    window.fb.onSnapshot(window.fb.collection(window.fb.db, "orders"), (snap) => {
+        let o = []; snap.forEach(d => o.push({id: d.id, ...d.data()}));
+        window.admin.renderOrders(o);
+    });
 </script>
 
+<script>
+    window.ui = {
+        toggle: (id) => { 
+            document.getElementById(id).classList.toggle('active'); 
+            document.getElementById('overlay').classList.toggle('active'); 
+        },
+        closeAll: () => { 
+            document.querySelectorAll('.side-panel').forEach(s => s.classList.remove('active')); 
+            document.getElementById('overlay').classList.remove('active'); 
+        },
+        setHeader: (email) => {
+            const count = Object.keys(window.app.cart || {}).length;
+            if(email) {
+                document.getElementById("navAuth").innerHTML = `
+                    <button class="chip-btn" onclick="window.ui.toggle('authSide')">Hi, ${email.split('@')[0]}</button>
+                    <button class="chip-btn" style="background:var(--primary); color:#000" onclick="window.ui.toggle('cartSide')">Cart (<span id="cartCount">${count}</span>)</button>
+                `;
+            } else {
+                document.getElementById("navAuth").innerHTML = `
+                    <button class="chip-btn" onclick="window.ui.toggle('authSide')">Account</button>
+                    <button class="chip-btn" style="background:var(--primary); color:#000" onclick="window.ui.toggle('cartSide')">Cart (<span id="cartCount">${count}</span>)</button>
+                `;
+            }
+        }
+    };
+
+    window.auth = {
+        isLogin: true,
+        showCustomerAuth: () => {
+            // FIX: Uses correct ID to prevent crashing
+            document.getElementById('authBox').style.display = 'block';
+            document.getElementById('adminAuthBox').style.display = 'none';
+            document.getElementById('profileBox').style.display = 'none';
+        },
+        showAdminAuth: () => {
+            // FIX: Uses correct ID to display the secure admin portal
+            document.getElementById('authBox').style.display = 'none';
+            document.getElementById('adminAuthBox').style.display = 'block';
+            document.getElementById('profileBox').style.display = 'none';
+        },
+        showProfile: (data) => {
+            document.getElementById('authBox').style.display = 'none';
+            document.getElementById('adminAuthBox').style.display = 'none';
+            document.getElementById('profileBox').style.display = 'block';
+            if(data) {
+                document.getElementById("upName").value = data.name || "";
+                document.getElementById("upPhone").value = data.phone || "";
+                document.getElementById("upAddr").value = data.address || "";
+            }
+        },
+        toggleMode: () => { 
+            window.auth.isLogin = !window.auth.isLogin; 
+            document.getElementById("regInputs").style.display = window.auth.isLogin ? 'none' : 'block'; 
+            document.getElementById("authTitle").innerText = window.auth.isLogin ? "Customer Login" : "Create Account"; 
+            document.getElementById("toggleAuthText").innerText = window.auth.isLogin ? "Switch to Register" : "Switch to Login";
+        },
+        adminLogin: () => {
+            const e = document.getElementById("adminEmail").value;
+            const p = document.getElementById("adminPass").value;
+            if(e === "admin@clean.com" && p === "admin123") {
+                window.ui.closeAll();
+                window.ui.toggle('adminSide');
+                document.getElementById("adminEmail").value = "";
+                document.getElementById("adminPass").value = "";
+            } else { alert("Invalid Admin Credentials"); }
+        },
+        submitAuth: async () => {
+            const e = document.getElementById("lEmail").value;
+            const p = document.getElementById("lPass").value;
+            try {
+                if(window.auth.isLogin) {
+                    await window.fb.signInWithEmailAndPassword(window.fb.auth, e, p);
+                } else {
+                    const res = await window.fb.createUserWithEmailAndPassword(window.fb.auth, e, p);
+                    await window.fb.addDoc(window.fb.collection(window.fb.db, "users"), {
+                        name: document.getElementById("rName").value,
+                        phone: document.getElementById("rPhone").value,
+                        address: document.getElementById("rAddr").value,
+                        email: e, uid: res.user.uid
+                    });
+                }
+                window.ui.closeAll();
+            } catch(err) { alert("Error: " + err.message); }
+        },
+        updateProfile: async () => {
+            const u = JSON.parse(localStorage.getItem("cc_user"));
+            if(!u) return;
+            await window.fb.updateDoc(window.fb.doc(window.fb.db, "users", u.docId), { 
+                name: document.getElementById("upName").value,
+                phone: document.getElementById("upPhone").value,
+                address: document.getElementById("upAddr").value 
+            });
+            alert("Profile Updated Successfully!");
+        },
+        logout: async () => { await window.fb.signOut(window.fb.auth); location.reload(); }
+    };
+
+    window.app = {
+        products: [],
+        cart: {},
+        render: (list = window.app.products, currentCat = "All") => {
+            const hG = document.getElementById("hotGrid");
+            const mG = document.getElementById("mainGrid");
+            const hTitle = document.getElementById("hotTitle");
+            const mTitle = document.getElementById("mainTitle");
+            
+            const hotList = list.filter(p => p.hot);
+            const mainList = list.filter(p => !p.hot);
+
+            const buildCard = (p) => {
+                const discount = p.oldPrice > p.price ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
+                const safeImgs = Array.isArray(p.imgs) && p.imgs.length > 0 && p.imgs[0] !== "" ? p.imgs : ['https://placehold.co/400?text=No+Image'];
+                
+                return `
+                <div class="p-card">
+                    ${p.hot ? '<div class="hot-label">HOT DEAL</div>' : ''}
+                    <div class="img-box" id="vp-${p.id}">
+                        ${safeImgs.map((img, i) => `<img src="${img}" class="${i===0?'active':''}" id="img-${p.id}-${i}" onerror="this.src='https://placehold.co/400?text=No+Image'">`).join('')}
+                    </div>
+                    <div class="thumb-nav">
+                        ${safeImgs.map((img, i) => `<img src="${img}" class="thumb ${i===0?'active':''}" onclick="window.app.sw('${p.id}',${i})" onerror="this.src='https://placehold.co/400?text=No+Image'">`).join('')}
+                    </div>
+                    <h3 style="margin-top:15px; font-size:18px;">${p.name}</h3>
+                    <div class="stock-label" style="color:${p.stock > 0 ? '#00c896' : '#ff3e3e'}">
+                        ${p.stock > 0 ? `In Stock: ${p.stock}` : 'Out of Stock'} ${discount > 0 ? ` | ${discount}% OFF` : ''}
+                    </div>
+                    <div class="price-tag">₹${p.price} ${p.oldPrice > p.price ? `<span class="old-price">₹${p.oldPrice}</span>` : ''}</div>
+                    <button class="main-btn" onclick="window.app.add('${p.id}')" style="margin-top:auto" ${p.stock <= 0 ? 'disabled' : ''}>
+                        ${p.stock > 0 ? 'Add to Cart' : 'Sold Out'}
+                    </button>
+                </div>`;
+            };
+            
+            hG.innerHTML = hotList.map(buildCard).join('');
+            mG.innerHTML = mainList.map(buildCard).join('');
+
+            // Hide titles if grid is empty
+            hTitle.style.display = hotList.length > 0 ? "block" : "none";
+            hG.style.display = hotList.length > 0 ? "grid" : "none";
+            mTitle.style.display = mainList.length > 0 ? "block" : "none";
+            mG.style.display = mainList.length > 0 ? "grid" : "none";
+            
+            mTitle.innerText = currentCat === "All" ? "All Products" : currentCat.charAt(0).toUpperCase() + currentCat.slice(1) + " Products";
+        },
+        sw: (pId, idx) => { 
+            document.querySelectorAll(`#vp-${pId} img`).forEach(img => img.classList.remove('active')); 
+            document.getElementById(`img-${pId}-${idx}`).classList.add('active'); 
+        },
+        genCats: () => {
+            const rawCats = window.app.products.map(p => p.cat).filter(c => c && c.trim() !== "");
+            const uniqueCats = [...new Set(rawCats)];
+            const frontCats = ["All", ...uniqueCats];
+            
+            document.getElementById("dynamicCats").innerHTML = frontCats.map(c => {
+                const label = c.charAt(0).toUpperCase() + c.slice(1);
+                return `<button class="chip-btn ${c==='All'?'active':''}" onclick="window.app.filter(this, '${c}')">${label}</button>`;
+            }).join('');
+            
+            const adminSelect = document.getElementById("apCatSelect");
+            if (adminSelect) {
+                if (uniqueCats.length > 0) {
+                    adminSelect.innerHTML = uniqueCats.map(c => {
+                        const label = c.charAt(0).toUpperCase() + c.slice(1);
+                        return `<option value="${c.toLowerCase()}">${label}</option>`;
+                    }).join('');
+                } else {
+                    adminSelect.innerHTML = `<option value="general">General</option>`;
+                }
+            }
+        },
+        filter: (btn, c) => {
+            document.querySelectorAll('#dynamicCats .chip-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            window.app.render(c === "All" ? window.app.products : window.app.products.filter(p => p.cat === c), c);
+        },
+        search: (v) => window.app.render(window.app.products.filter(p => p.name.toLowerCase().includes(v.toLowerCase())), "Search Results"),
+        
+        add: (id) => {
+            const p = window.app.products.find(x => x.id === id);
+            if(window.app.cart[id]) {
+                if(window.app.cart[id].qty < p.stock) window.app.cart[id].qty++;
+                else alert("Cannot add more than available stock!");
+            } else { window.app.cart[id] = { ...p, qty: 1 }; }
+            window.app.upCart();
+        },
+        updateQty: (id, change) => {
+            if(window.app.cart[id]) {
+                window.app.cart[id].qty += change;
+                if(window.app.cart[id].qty <= 0) delete window.app.cart[id];
+                window.app.upCart();
+            }
+        },
+        upCart: () => {
+            const list = document.getElementById("cartList");
+            let total = 0, count = 0, originalTotal = 0;
+            
+            list.innerHTML = Object.values(window.app.cart).map(i => {
+                total += (i.price * i.qty);
+                originalTotal += ((i.oldPrice || i.price) * i.qty);
+                count += i.qty;
+                const safeImg = Array.isArray(i.imgs) && i.imgs.length > 0 && i.imgs[0] !== "" ? i.imgs[0] : 'https://placehold.co/100';
+                return `
+                <div class="item-row" style="align-items:center; padding:10px;">
+                    <img src="${safeImg}" style="width:50px; height:50px; object-fit:cover; border-radius:8px; margin-right:15px; background:#000;">
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:14px">${i.name}</div>
+                        <div style="color:var(--dim); font-size:11px">₹${i.price} / unit</div>
+                        <div style="color:var(--primary); font-weight:800; margin-top:4px;">₹${i.price * i.qty}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px; background:#000; padding:5px 10px; border-radius:8px; border:1px solid #333">
+                        <button style="background:none; border:none; color:var(--primary); font-size:18px; cursor:pointer" onclick="window.app.updateQty('${i.id}', -1)">-</button>
+                        <span style="font-weight:700">${i.qty}</span>
+                        <button style="background:none; border:none; color:var(--primary); font-size:18px; cursor:pointer" onclick="window.app.updateQty('${i.id}', 1)">+</button>
+                    </div>
+                </div>`;
+            }).join('') || "<div style='text-align:center; color:var(--dim); margin-top:40px;'>Your cart is empty.</div>";
+            
+            // FIX: Removed text duplication
+            document.getElementById("cartTotal").innerText = "₹" + total; 
+            if(document.getElementById("cartCount")) document.getElementById("cartCount").innerText = count;
+            
+            const savings = originalTotal - total;
+            document.getElementById("cartSavings").innerText = savings > 0 ? `-₹${savings}` : "₹0";
+        },
+        checkout: async () => {
+            const user = JSON.parse(localStorage.getItem("cc_user"));
+            if(!user) { window.ui.toggle('cartSide'); window.ui.toggle('authSide'); return alert("Please Sign In to complete your order."); }
+            if(Object.keys(window.app.cart).length === 0) return alert("Cart is empty!");
+
+            const orderID = "CC" + Math.floor(Math.random() * 900000);
+            const total = document.getElementById("cartTotal").innerText;
+            const itemsArr = Object.values(window.app.cart).map(i => `${i.name} (x${i.qty})`);
+            
+            const orderData = { 
+                orderID, user: user.name, userEmail: user.email, address: user.address, phone: user.phone,
+                items: itemsArr, total, status: "New", date: new Date().toLocaleString() 
+            };
+            
+            try {
+                await window.fb.addDoc(window.fb.collection(window.fb.db, "orders"), orderData);
+                for(let item of Object.values(window.app.cart)) {
+                    await window.fb.updateDoc(window.fb.doc(window.fb.db, "products", item.id), { stock: item.stock - item.qty });
+                }
+                
+                let waMsg = `*New Order: ${orderID}*%0A*Name:* ${user.name}%0A*Phone:* ${user.phone}%0A*Address:* ${user.address}%0A%0A*Items:*%0A- ${itemsArr.join('%0A- ')}%0A%0A*Total:* ${total}`;
+                window.open(`https://wa.me/919999999999?text=${waMsg}`);
+                
+                window.app.cart = {}; window.app.upCart(); window.ui.closeAll(); alert("Order Placed Successfully!");
+            } catch(e) { alert("Checkout Error: " + e.message); }
+        },
+        loadHistory: async (email) => {
+            const q = window.fb.query(window.fb.collection(window.fb.db, "orders"), window.fb.where("userEmail", "==", email));
+            const snap = await window.fb.getDocs(q);
+            let h = "";
+            snap.forEach(d => {
+                const o = d.data();
+                h += `<div class="item-row"><span class="status-badge">${o.status}</span> <div><b>${o.orderID}</b><br><small style="color:var(--dim)">${o.total}</small></div></div>`;
+            });
+            document.getElementById("userOrders").innerHTML = h || "<p style='color:var(--dim)'>No past orders.</p>";
+        }
+    };
+
+    window.admin = {
+        upload: async () => {
+            const catVal = document.getElementById("apCatNew").value.trim() || document.getElementById("apCatSelect").value;
+            const p = {
+                name: document.getElementById("apName").value,
+                price: Number(document.getElementById("apPrice").value),
+                oldPrice: Number(document.getElementById("apOld").value) || Number(document.getElementById("apPrice").value),
+                stock: Number(document.getElementById("apStock").value),
+                imgs: document.getElementById("apImgs").value.split(','),
+                cat: catVal.toLowerCase(),
+                hot: document.getElementById("apHot").checked
+            };
+            if(!p.name || !p.price) return alert("Name and Price are required.");
+            try {
+                await window.fb.addDoc(window.fb.collection(window.fb.db, "products"), p);
+                alert("Product Added to Database!");
+                document.querySelectorAll('#adminSide input').forEach(i => i.type !== 'checkbox' ? i.value = "" : i.checked = false);
+            } catch(e) { alert("Upload Error: " + e.message); }
+        },
+        renderInv: (list) => {
+            document.getElementById("adminProdList").innerHTML = list.map(p => `
+                <div class="item-row" style="padding:10px; align-items:flex-start; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:10px;">
+                        <div><b style="font-size:14px;">${p.name}</b><br><small style="color:var(--dim)">Stock: ${p.stock} | Price: ₹${p.price}</small></div>
+                        <span class="status-badge">${p.cat}</span>
+                    </div>
+                    <div style="display:flex; gap:10px; width:100%;">
+                        <button class="main-btn" style="padding:6px; font-size:11px; background:#222; color:#fff;" onclick="window.admin.editP('${p.id}')">Edit Product</button>
+                        <button class="danger-btn" style="padding:6px; width:80px;" onclick="window.admin.delP('${p.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        },
+        editP: async (id) => {
+            const p = window.app.products.find(x => x.id === id);
+            const nName = prompt("Update Name:", p.name);
+            if(!nName) return; 
+            const nPrice = prompt("Update Sale Price:", p.price);
+            const nOld = prompt("Update Original Price:", p.oldPrice || p.price);
+            const nStock = prompt("Update Stock Qty:", p.stock);
+            
+            if(nName && nPrice && nStock) {
+                await window.fb.updateDoc(window.fb.doc(window.fb.db, "products", id), {
+                    name: nName, price: Number(nPrice), oldPrice: Number(nOld), stock: Number(nStock)
+                });
+                alert("Product Updated Successfully!");
+            }
+        },
+        renderOrders: (list) => {
+            list.sort((a,b) => new Date(b.date) - new Date(a.date)); 
+            document.getElementById("adminOrderList").innerHTML = list.map(o => `
+                <div class="item-row" style="flex-direction:column; align-items:flex-start">
+                    <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:10px">
+                        <b>${o.orderID} - <span style="color:var(--primary)">${o.status}</span></b>
+                        <small style="color:var(--dim)">${o.date}</small>
+                    </div>
+                    <p style="font-size:13px; margin-bottom:5px"><b>Customer:</b> ${o.user} (${o.phone})</p>
+                    <p style="font-size:13px; margin-bottom:10px"><b>Address:</b> ${o.address}</p>
+                    <div style="background:#000; padding:10px; border-radius:8px; width:100%; border:1px solid #333">
+                        <p style="font-size:12px; color:var(--dim)">${o.items.join('<br>')}</p>
+                        <b style="color:var(--primary); display:block; margin-top:5px">${o.total}</b>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:15px; width:100%">
+                        <button class="main-btn" style="padding:8px; font-size:12px; color:#000;" onclick="window.admin.markDone('${o.id}')">Mark Delivered</button>
+                        <button class="danger-btn" style="padding:8px; width:100%" onclick="window.admin.delOrder('${o.id}')">Delete Order</button>
+                    </div>
+                </div>
+            `).join('') || "<p style='color:var(--dim)'>No orders yet.</p>";
+        },
+        delP: async (id) => { if(confirm("Permanently delete this product?")) await window.fb.deleteDoc(window.fb.doc(window.fb.db, "products", id)); },
+        delOrder: async (id) => { if(confirm("Permanently delete this order record?")) await window.fb.deleteDoc(window.fb.doc(window.fb.db, "orders", id)); },
+        markDone: async (id) => { await window.fb.updateDoc(window.fb.doc(window.fb.db, "orders", id), { status: "Delivered" }); }
+    };
+</script>
 </body>
 </html>
